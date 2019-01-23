@@ -18,7 +18,7 @@ public class AopTest {
 //        System.out.println(i);
         ApplicationContext ac = new AnnotationConfigApplicationContext(Config05.class);
         MathCalculator mathCalculator = (MathCalculator) ac.getBean("calculator");
-        mathCalculator.div(6, 0);
+        mathCalculator.div(6, 2);
 
     }
 }
