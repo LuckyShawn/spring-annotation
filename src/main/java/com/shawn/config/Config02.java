@@ -1,6 +1,13 @@
 package com.shawn.config;
 
+import com.shawn.bean.Color;
+import com.shawn.bean.ColorFactoryBean;
 import com.shawn.bean.Person;
+import com.shawn.bean.Red;
+import com.shawn.condition.LinuxCondition;
+import com.shawn.condition.MyImportBeanDefinitionRegistrar;
+import com.shawn.condition.MyImportSelector;
+import com.shawn.condition.WindowsCondition;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.*;
 
@@ -9,7 +16,11 @@ import org.springframework.context.annotation.*;
  * @Author shawn
  * @create 2019/1/22 0022
  */
+//类中组件统一设置。满足当前条件，这个类中配置的所有bean注册才能生效；
+//@Conditional({WindowsCondition.class})
 @Configuration
+@Import({Color.class,Red.class,MyImportSelector.class,MyImportBeanDefinitionRegistrar.class})
+//@Import导入组件，id默认是组件的全类名
 public class Config02 {
 
 
@@ -49,15 +60,34 @@ public class Config02 {
      * 如果是linux系统，给容器中注册("linus")
      */
 
+    @Conditional(WindowsCondition.class)
     @Bean("bill")
     public Person person01(){
         return new Person("Bill Gates",62);
     }
 
-    //@Conditional("linus")
+    @Conditional(LinuxCondition.class)
     @Bean("linus")
     public Person person02(){
         return new Person("linus", 48);
+    }
+
+    /**
+     * 给容器中注册组件；
+     * 1）、包扫描+组件标注注解（@Controller/@Service/@Repository/@Component）[自己写的类]
+     * 2）、@Bean[导入的第三方包里面的组件]
+     * 3）、@Import[快速给容器中导入一个组件]
+     * 		1）、@Import(要导入到容器中的组件)；容器中就会自动注册这个组件，id默认是全类名
+     * 		2）、ImportSelector:返回需要导入的组件的全类名数组；
+     * 		3）、ImportBeanDefinitionRegistrar:手动注册bean到容器中
+     * 4）、使用Spring提供的 FactoryBean（工厂Bean）;
+     * 		1）、默认获取到的是工厂bean调用getObject创建的对象
+     * 		2）、要获取工厂Bean本身，我们需要给id前面加一个&
+     * 			&colorFactoryBean
+     */
+    @Bean
+    public ColorFactoryBean colorFactoryBean(){
+        return new ColorFactoryBean();
     }
 
 }
